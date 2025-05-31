@@ -5,9 +5,9 @@
 
 using namespace std;
 
-// �ʰ��� ���� �׽�Ʈ
-// ����: �Ʒ� ����(Operation, Request)�� ������ ��
-// ť�� Item�� void*�̹Ƿ� �󸶵��� �޶��� �� ����
+// 초간단 구동 테스트
+// 주의: 아래 정의(Operation, Request)는 예시일 뿐
+// 큐의 Item은 void*이므로 얼마든지 달라질 수 있음
 
 #define REQUEST_PER_CLINET	10000
 
@@ -40,19 +40,19 @@ void client_func(Queue* queue, Request requests[], int n_request) {
 		}
 
 		if (reply.success) {
-			// �ܼ��� ���Ϲ��� Ű ���� ����(�ƹ� �ǹ� ����)
+			// 단순히 리턴받은 키 값을 더함(아무 의미 없음)
 			sum_key += reply.item.key;
-			sum_value += (int)reply.item.value;// void*���� �ٽ� int�� ��ȯ
+			sum_value += (int)reply.item.value; // void*에서 다시 int로 변환
 
-			// ���Ϲ��� key, value �� ����
-			// ...����...
+			// 리턴받은 key, value 값 검증
+			// ...생략...
 		}
 		else {
 			// noop
 		}
 	}
 
-	// ��¥�� �ʿ��� �� �����ð��� �����ϴ� �ڵ�
+	// 진짜로 필요한 건 지연시간을 측정하는 코드
 	//
 	// elapsed_time = finish_time - start_time;
 	// finish_time = ....
@@ -64,7 +64,7 @@ void client_func(Queue* queue, Request requests[], int n_request) {
 int main(void) {
 	srand((unsigned int)time(NULL));
 
-	// ��ũ�ε� ����(GETRANGE�� �н�)
+	// 워크로드 생성(GETRANGE는 패스)
 	Request requests[REQUEST_PER_CLINET];
 	for (int i = 0; i < REQUEST_PER_CLINET / 2; i++) {
 		requests[i].op = SET;
@@ -78,17 +78,17 @@ int main(void) {
 	Queue* queue = init();
 	//if (queue == NULL) return 0;
 
-	// �ϴ� �� �� ���ε�, �׷��� multi client��� �����ϱ�
+	// 일단 한 개 뿐인데, 그래도 multi client라고 가정하기
 	thread client = thread(client_func, queue, requests, REQUEST_PER_CLINET);
 	client.join();
 
 	release(queue);
 
-	// �ǹ� ���� �۾�
+	// 의미 없는 작업
 	cout << "sum of returned keys = " << sum_key << endl;
 	cout << "sum of returned values = " << sum_value << endl;
 
-	// ��¥�� �ʿ��� �ڵ�
+	// 진짜로 필요한 코드
 	// total_average_response_time = total_response_time / n_cleint;
 	// printf("total average response time = ....
 	return 0;
